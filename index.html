@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Giriş</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+ <style>
+
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f2f4f7;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      background-color: #fdfdfd;
+    }
+
+    
+
+    .login-container button:hover {
+      background-color: #1a252f;
+    }
+
+    #error {
+      color: #e74c3c;
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+	
+	 .veribtn {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: white;
+      border: none;
+     width: 100%;
+      height: 50px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      margin: 10px;
+	    margin-left:-1px;
+    }
+
+    .veribtn:hover {
+      background: linear-gradient(135deg, #f76b1c, #fcb045);
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+	#togglePassword:hover {
+    color: #000;
+  }
+  </style>
+</head>
+<body>
+
+
+ <div class="login-container">
+  <h2>Yönetici Girişi</h2>
+  <form onsubmit="login(event)">
+    <input type="email" id="email" placeholder="E-posta" required>
+	<div style="position: relative;">
+    <input type="password" id="password" placeholder="Şifre" required>
+	 <span id="togglePassword" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:14px; color:#555;">Göster</span>
+  </div>
+  <small id="capsWarning" style="color:#e67e22; display:none;">⚠️ Caps Lock açık</small>
+    <button type="submit" class="veribtn">Giriş Yap</button>
+    <p id="error"></p>
+  </form>
+</div>
+
+
+  <script>
+      // **************************************************************
+    // xxx Firebase config bağlantısı
+ const firebaseConfig = {
+  apiKey: "AIzaSyD2iTMYApCfJYVuhz21sOYLYd4vb3BPWtQ",
+  authDomain: "bekbasdata.firebaseapp.com",
+  projectId: "bekbasdata",
+  storageBucket: "bekbasdata.firebasestorage.app",
+  messagingSenderId: "733007941267",
+  appId: "1:733007941267:web:bc685a0d4338a9f2474766",
+  measurementId: "G-Y43NXK6DN8"
+};
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+       // **************************************************************
+  // xxx KULLANICI ŞİFRE GİRİŞİ LOGİN KISMI
+  function showError(msg) {
+    document.getElementById("error").textContent = msg;
+  }
+
+  function mapAuthError(code) {
+    switch (code) {
+      case "auth/invalid-email": return "Geçersiz e‑posta adresi.";
+      case "auth/user-not-found": return "Kullanıcı bulunamadı.";
+      case "auth/wrong-password":
+      case "auth/invalid-login-credentials": return "E‑posta veya şifre hatalı.";
+      case "auth/too-many-requests": return "Çok fazla deneme yapıldı. Lütfen biraz bekleyin.";
+      case "auth/network-request-failed": return "İnternet bağlantınızda sorun var.";
+      case "auth/user-disabled": return "Bu hesap devre dışı bırakılmış.";
+      default: return "Bilinmeyen bir hata oluştu.";
+    }
+  }
+
+function login(event) {
+ event.preventDefault(); // formun sayfayı yenilemesini engelle
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  
+ // Öncelikli olarak özel admin kontrolü
+  if (email === "asbekbas@gmail.com" && password === "aaaaaa") {
+    // Admin paneline yönlendir
+    window.location.href = "admin.html";
+    return; // Diğer kontrolleri durdur
+  }
+  auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)  // ← sadece sekme açıkken oturum sürsün
+    .then(() => {
+      return auth.signInWithEmailAndPassword(email, password);
+    })
+    .then(() => {
+      window.location.href = "secim.html";
+    })
+    .catch(err => {
+      showError(mapAuthError(err.code));
+    });
+}
+      // **************************************************************
+
+// Caps Lock kontrolü
+function checkCapsLock(event) {
+  const capsWarning = document.getElementById("capsWarning");
+  const isCaps = event.getModifierState && event.getModifierState("CapsLock");
+  capsWarning.style.display = isCaps ? "inline" : "none";
+}
+
+// Şifre göster/gizle
+document.getElementById("togglePassword").addEventListener("click", function () {
+  const passwordInput = document.getElementById("password");
+  const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+  passwordInput.setAttribute("type", type);
+  this.textContent = type === "password" ? "Göster" : "Gizle";
+});
+     // **************************************************************
+	 const passwordInput = document.getElementById("password");
+const capsWarning = document.getElementById("capsWarning");
+
+// Caps Lock kontrolü
+passwordInput.addEventListener("keyup", function (e) {
+  const capsOn = e.getModifierState && e.getModifierState("CapsLock");
+  capsWarning.style.display = capsOn ? "inline" : "none";
+});
+
+// Focus dışına çıkıldığında uyarıyı kaldır
+passwordInput.addEventListener("blur", function () {
+  capsWarning.style.display = "none";
+});
+
+ // **************************************************************
+
+  </script>
+</body>
+</html>

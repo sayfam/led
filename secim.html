@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Seçim Paneli</title>
+
+  <style>
+  
+   /* ******************************************************** */
+ /* ==== Header / Menü ==== */
+.site-header{
+  position:fixed;
+  top:0; left:0;
+  width:98%;
+  height:60px;
+  background:#2c3e50;          /* menü rengi */
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  z-index:1000;                /* kartın üstünde kalsın */
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.site-header .logo{
+  font-weight:600;
+  font-size:18px;
+  letter-spacing:.3px;
+}
+.main-nav{
+  display:flex;
+  gap:24px;
+}
+.main-nav a{
+  color:#fff;
+  text-decoration:none;
+  font-size:15px;
+  transition:opacity .25s;
+}
+.main-nav a:hover{opacity:.7}
+
+/* Hamburger */
+.burger{
+  display:none;
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:28px;
+  cursor:pointer;
+  margin-right:15px;
+}
+
+/* Mobil (≤768 px) */
+@media (max-width:768px){
+  .main-nav{
+    position:fixed;
+    top:60px;          /* header yüksekliği */
+    right:-100%;
+    width:200px;
+    height:calc(100vh - 60px);
+    background:#34495e;
+    flex-direction:column;
+    align-items:flex-start;
+    padding:24px;
+    gap:16px;
+    transition:right .3s ease;
+  }
+  .main-nav.open{right:0;}    /* JS ile ekleniyor */
+  .burger{display:block;}
+}
+
+/* Login kartını aşağı kaydır — header’ın altında kalsın */
+.login-container{
+  margin-top:80px;   /* 60px yükseklik + 20px aralık */
+}
+/* ******************************************************** */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .veribtn {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: white;
+      border: none;
+      width: 160px;
+      height: 50px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+
+    .veribtn:hover {
+      background: linear-gradient(135deg, #f76b1c, #fcb045);
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+	.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #ffffff;
+  min-width: 180px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.dropdown-content a {
+   color: #000 !important;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+    color: #000 !important; /* üst link beyaz kalacak */
+}
+
+.dropdown.show .dropdown-content {
+  display: block;
+}
+.dropdown-content {
+  right: 0;
+  left: auto;  /* ← bu eklendi */
+}
+.main-nav .dropdown a {
+  color: #fff; /* üst link beyaz kalacak */
+}
+  </style>
+
+</head>
+<body>
+
+<!-- ***************************************************** -->
+<!-- ======= HEADER / NAVBAR ======= -->
+<header class="site-header">
+  <div class="brand">
+    <!-- Logo veya başlık -->
+    <span class="logo">BEKBAŞ PANEL</span>
+	
+  </div>
+
+  <!-- Masaüstü menü -->
+  <nav class="main-nav">
+    <a href="secim.html">Anasayfa</a>
+    <!-- <a href="secim.html">Merkez</a>
+    <a href="https://sayfan.github.io/not/" target="_blank">Kullanıcı Görüntüle</a> -->
+
+
+
+ <div class="dropdown">
+    <a href="#" id="dropdownBtn">Ayarlar ▾</a>
+    <div class="dropdown-content">
+      <a href="ayarlar.html">Genel Ayarlar</a>
+      <a href="profil.html">Profil</a>
+      <a href="sifredegistir.html">Şifre Değiştir</a>
+    </div>
+  </div>
+  
+  
+  
+    <a href="iletisim.html">İletişim</a>
+    <a href="#" id="logoutBtn">Çıkış</a>
+  </nav>
+
+  <!-- Hamburger – mobil görünüm -->
+  <button class="burger" id="navToggle" aria-label="menüyü aç/kapat">
+    ☰
+  </button>
+</header>
+
+<!-- ***************************************************** -->
+
+  <form action="merkez.html">
+    <button class="veribtn" type="submit">Merkez Verileri</button>
+  </form>
+  <form action="sube.html">
+    <button class="veribtn" type="submit">Şube Verileri</button>
+  </form>
+  
+
+
+
+
+
+</body>
+<script>
+
+// **************************************************************
+    // xxx Firebase config bağlantısı
+ const firebaseConfig = {
+  apiKey: "AIzaSyD2iTMYApCfJYVuhz21sOYLYd4vb3BPWtQ",
+  authDomain: "bekbasdata.firebaseapp.com",
+  projectId: "bekbasdata",
+  storageBucket: "bekbasdata.firebasestorage.app",
+  messagingSenderId: "733007941267",
+  appId: "1:733007941267:web:bc685a0d4338a9f2474766",
+  measurementId: "G-Y43NXK6DN8"
+};
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+  // **************************************************************
+   
+  // Eğer kullanıcı giriş yapmadıysa index.html (login) sayfasına at
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "index.html"; // ← çünkü senin login sayfan bu
+    }
+  });
+
+ 
+  // Çıkış yapma işlevi
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    firebase.auth().signOut().then(() => {
+      window.location.href = "index.html"; // ← oturum kapanınca geri dön
+    });
+  });
+  
+     // **************************************************************
+   // Menü toggle
+document.getElementById("dropdownBtn").addEventListener("click", () => {
+  document.querySelector(".dropdown").classList.toggle("show");
+});
+
+// Menü dışına tıklanınca kapat
+window.addEventListener("click", function(e) {
+  if (!e.target.matches('#dropdownBtn')) {
+    const dropdowns = document.getElementsByClassName("dropdown");
+    for (let d of dropdowns) {
+      d.classList.remove('show');
+    }
+  }
+});
+
+
+   
+     // **************************************************************
+   
+   // OTURUM SAYACI
+let inactivityTimer;
+let autoLogoutTimer;
+const warningTime = 4.5 * 60 * 1000; // 4.5 dakika (270000 ms)
+  const logoutDelay = 30 * 1000; // 30 saniye (30000 ms)
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  clearTimeout(autoLogoutTimer);
+  console.log("⏱️ Etkinlik tespit edildi → sayaç sıfırlandı.");
+
+  inactivityTimer = setTimeout(() => {
+    console.log("⚠️ Uyarı gösteriliyor: Oturum süresi dolmak üzere!");
+
+    let userResponded = false;
+
+    Swal.fire({
+      title: 'Oturum süresi dolmak üzere!',
+      text: 'Oturuma devam etmek istiyor musunuz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, devam et',
+      cancelButtonText: 'Hayır, çıkış yap',
+      allowOutsideClick: false,
+      timer: logoutDelay,
+      timerProgressBar: true
+    }).then((result) => {
+      userResponded = true;
+      clearTimeout(autoLogoutTimer);
+      console.log("✅ Kullanıcı yanıt verdi:", result.isConfirmed ? "Evet (devam)" : "Hayır (çıkış)");
+
+      if (result.isConfirmed) {
+        resetInactivityTimer();
+      } else {
+        console.log("🚪 Kullanıcı çıkış yapmayı seçti.");
+        firebase.auth().signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    });
+
+    autoLogoutTimer = setTimeout(() => {
+      if (!userResponded) {
+        console.log("⛔ Süre doldu, kullanıcı yanıt vermedi → çıkış yapılıyor.");
+        firebase.auth().currentUser && firebase.auth().signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    }, logoutDelay);
+
+    console.log("⏳ Cevap için bekleme süresi başlatıldı →", logoutDelay / 1000, "saniye");
+  }, warningTime);
+
+  console.log("🔄 Yeni uyarı süresi başladı →", warningTime / 1000, "saniye");
+}
+
+
+['click', 'mousemove', 'keypress', 'touchstart'].forEach(event => {// Kullanıcı etkileşimleri ile sayaç sıfırlama
+  document.addEventListener(event, resetInactivityTimer);
+});
+
+resetInactivityTimer(); // sayfa açıldığında başlat
+
+
+// **************************************************************
+// ======= Menü hamburger toggle =======
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.querySelector('.main-nav').classList.toggle('open');
+});
+
+// **************************************************************
+  
+</script>
+  </script>
+</html>

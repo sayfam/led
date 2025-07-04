@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Seçim Paneli</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .veribtn {
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      color: white;
+      border: none;
+      width: 160px;
+      height: 50px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+
+    .veribtn:hover {
+      background: linear-gradient(135deg, #f76b1c, #fcb045);
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+  </style>
+
+</head>
+<body>
+
+
+    <p class="veribtn" type="submit">ONARIMDA</p>
+  
+  
+</body>
+<script>
+
+// **************************************************************
+    // xxx Firebase config bağlantısı
+ const firebaseConfig = {
+  apiKey: "AIzaSyD2iTMYApCfJYVuhz21sOYLYd4vb3BPWtQ",
+  authDomain: "bekbasdata.firebaseapp.com",
+  projectId: "bekbasdata",
+  storageBucket: "bekbasdata.firebasestorage.app",
+  messagingSenderId: "733007941267",
+  appId: "1:733007941267:web:bc685a0d4338a9f2474766",
+  measurementId: "G-Y43NXK6DN8"
+};
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+  // **************************************************************
+   
+  // Eğer kullanıcı giriş yapmadıysa index.html (login) sayfasına at
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "index.html"; // ← çünkü senin login sayfan bu
+    }
+  });
+
+  // Çıkış yapma işlevi
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    firebase.auth().signOut().then(() => {
+      window.location.href = "index.html"; // ← oturum kapanınca geri dön
+    });
+  });
+  
+   
+   
+   
+     // **************************************************************
+   
+   // OTURUM SAYACI
+let inactivityTimer;
+let autoLogoutTimer;
+const warningTime = 4.5 * 60 * 1000; // 4.5 dakika (270000 ms)
+  const logoutDelay = 30 * 1000; // 30 saniye (30000 ms)
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  clearTimeout(autoLogoutTimer);
+  console.log("⏱️ Etkinlik tespit edildi → sayaç sıfırlandı.");
+
+  inactivityTimer = setTimeout(() => {
+    console.log("⚠️ Uyarı gösteriliyor: Oturum süresi dolmak üzere!");
+
+    let userResponded = false;
+
+    Swal.fire({
+      title: 'Oturum süresi dolmak üzere!',
+      text: 'Oturuma devam etmek istiyor musunuz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, devam et',
+      cancelButtonText: 'Hayır, çıkış yap',
+      allowOutsideClick: false,
+      timer: logoutDelay,
+      timerProgressBar: true
+    }).then((result) => {
+      userResponded = true;
+      clearTimeout(autoLogoutTimer);
+      console.log("✅ Kullanıcı yanıt verdi:", result.isConfirmed ? "Evet (devam)" : "Hayır (çıkış)");
+
+      if (result.isConfirmed) {
+        resetInactivityTimer();
+      } else {
+        console.log("🚪 Kullanıcı çıkış yapmayı seçti.");
+        firebase.auth().signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    });
+
+    autoLogoutTimer = setTimeout(() => {
+      if (!userResponded) {
+        console.log("⛔ Süre doldu, kullanıcı yanıt vermedi → çıkış yapılıyor.");
+        firebase.auth().currentUser && firebase.auth().signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    }, logoutDelay);
+
+    console.log("⏳ Cevap için bekleme süresi başlatıldı →", logoutDelay / 1000, "saniye");
+  }, warningTime);
+
+  console.log("🔄 Yeni uyarı süresi başladı →", warningTime / 1000, "saniye");
+}
+
+
+['click', 'mousemove', 'keypress', 'touchstart'].forEach(event => {// Kullanıcı etkileşimleri ile sayaç sıfırlama
+  document.addEventListener(event, resetInactivityTimer);
+});
+
+resetInactivityTimer(); // sayfa açıldığında başlat
+
+
+// **************************************************************
+  
+</script>
+  </script>
+</html>

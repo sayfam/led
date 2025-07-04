@@ -1,0 +1,8 @@
+			
+
+		      İNDEX(login)
+			  I
+			SECİM --ADMİN
+			/    \
+		   MERKEZ     SUBE
+		   (user)    (user)
