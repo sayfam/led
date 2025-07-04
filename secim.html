@@ -77,6 +77,47 @@
 .login-container{
   margin-top:80px;   /* 60px yükseklik + 20px aralık */
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #ffffff;
+  min-width: 180px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.dropdown-content a {
+   color: #000 !important;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+    color: #000 !important; /* üst link beyaz kalacak */
+}
+
+.dropdown.show .dropdown-content {
+  display: block;
+}
+.dropdown-content {
+  right: 0;
+  left: auto;  /* ← bu eklendi */
+}
+.main-nav .dropdown a {
+  color: #fff; /* üst link beyaz kalacak */
+}
 /* ******************************************************** */
     body {
       margin: 0;
@@ -202,9 +243,12 @@
   </form>
   
 
+<!-- ***************************************************** -->
 
-
-
+<footer class="site-footer">
+  <p>&copy; 2025 Bekbaş Panel | Tüm hakları saklıdır!</p>
+</footer>
+<!-- ***************************************************** -->
 
 </body>
 <script>
